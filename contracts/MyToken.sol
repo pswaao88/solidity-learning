@@ -4,6 +4,8 @@ pragma solidity ^0.8.28;
 
 contract MyToken {
     event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed spender, uint256 amount);
+
     string public name; // 토큰이름 ex) 비트코인, 이더리움, 밈코인...
     string public symbol; // ex) 이더리움: eth...
     uint8 public decimals; // 소수점 자리수 1이면 0.1까지
@@ -30,6 +32,7 @@ contract MyToken {
 
     function approve(address spender, uint256 amount) external {
         allowance[msg.sender][spender] = amount;
+        emit Approval(spender, amount);
     }
 
     function transferFrom(address from, address to, uint256 amount) external {
@@ -38,6 +41,7 @@ contract MyToken {
         allowance[from][spender] -= amount;
         balanceOf[from] -= amount;
         balanceOf[to] += amount;
+        emit Transfer(from, to, amount);
     }
 
     // 토큰 발행
