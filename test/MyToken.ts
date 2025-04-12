@@ -119,5 +119,24 @@ describe("My Token", () => {
           )
       ).to.be.revertedWith("insufficient allowance");
     });
+
+    it("should move signer0 to signer1 by signer1", async () => {
+      const signer0 = signers[0];
+      const signer1 = signers[1];
+      // connect를 통해 signer0가 트랜잭션을 만들게된다.
+      // signer0가 msg.sender가 되므로
+      // approve 메소드를 이용해 signer1에게 해당되는 개수 만큼 허용을 해준다.
+      await myTokenC
+        .connect(signer0)
+        .approve(signer1, hre.ethers.parseUnits("20", decimal));
+      // signer0 에서 singer1으로 10개를 보낸다.
+      await myTokenC
+        .connect(signer1)
+        .transferFrom(signer0, signer1, hre.ethers.parseUnits("10", decimal));
+      // await으로 처리를 기다린 후에 equal을 해야 정상적으로 작동
+      expect(await myTokenC.balanceOf(signer1)).equal(
+        hre.ethers.parseUnits("10", decimal) // signer1의 잔액이 10MT인지 확인
+      );
+    });
   });
 });
