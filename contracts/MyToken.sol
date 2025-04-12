@@ -3,6 +3,7 @@
 pragma solidity ^0.8.28;
 
 contract MyToken {
+    event Transfer(address from, address to, uint256 value);
     string public name; // 토큰이름 ex) 비트코인, 이더리움, 밈코인...
     string public symbol; // ex) 이더리움: eth...
     uint8 public decimals; // 소수점 자리수 1이면 0.1까지
@@ -35,5 +36,7 @@ contract MyToken {
         require(balanceOf[msg.sender] >= amount, "insufficient balance");
         balanceOf[msg.sender] -= amount;
         balanceOf[to] += amount;
+
+        emit Transfer(msg.sender, to, amount);
     }
 }

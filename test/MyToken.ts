@@ -22,6 +22,7 @@ describe("My Token", () => {
       100,
     ]);
   });
+
   describe("Basic state value check", async () => {
     it("should return name", async () => {
       expect(await myTokenC.name()).equal("MyToken");
@@ -49,13 +50,17 @@ describe("My Token", () => {
       );
     });
   });
+
   describe("Transfer", () => {
+    // 트랜잭션
     it("should have 0.5MT", async () => {
       const signer1 = signers[1];
-      await myTokenC.transfer(
+      const tx = await myTokenC.transfer(
         hre.ethers.parseUnits("0.5", decimal),
         signer1.address
       );
+      const receipt = await tx.wait();
+      console.log(receipt?.logs);
       expect(await myTokenC.balanceOf(signer1)).equal(
         hre.ethers.parseUnits("0.5", decimal)
       );
