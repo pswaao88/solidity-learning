@@ -10,6 +10,8 @@ contract MyToken {
 
     uint256 public totalSupply;
     mapping(address => uint256) public balanceOf;
+    // owner =>
+    mapping(address => mapping(address => uint256)) allowance;
 
     constructor(
         string memory _name,
@@ -25,6 +27,10 @@ contract MyToken {
 
     // transaction
     // from, to, data, value, gas ...
+
+    function approve(address spender, uint256 amount) external {
+        allowance[msg.sender][spender] = amount;
+    }
 
     // 토큰 발행
     function _mint(uint256 amount, address owner) internal {
