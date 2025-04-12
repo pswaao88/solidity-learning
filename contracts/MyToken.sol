@@ -32,6 +32,14 @@ contract MyToken {
         allowance[msg.sender][spender] = amount;
     }
 
+    function transferFrom(address from, address to, uint256 amount) external {
+        address spender = msg.sender;
+        require(allowance[from][spender] >= amount, "insufficient allowance");
+        allowance[from][spender] -= amount;
+        balanceOf[from] -= amount;
+        balanceOf[to] += amount;
+    }
+
     // 토큰 발행
     function _mint(uint256 amount, address owner) internal {
         totalSupply += amount;
