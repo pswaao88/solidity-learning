@@ -3,8 +3,8 @@ import { expect } from "chai";
 import { MyToken } from "../typechain-types";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
-const mintingAmount = 100n;
-const decimal = 18n;
+const MINTINGAMOUNT = 100n;
+const DECIMAL = 18n;
 
 describe("My Token", () => {
   let myTokenC: MyToken;
@@ -36,7 +36,7 @@ describe("My Token", () => {
 
     it("should return 100 totalSupply", async () => {
       expect(await myTokenC.totalSupply()).equal(
-        mintingAmount * 10n ** decimal
+        MINTINGAMOUNT * 10n ** DECIMAL
       );
     });
   });
@@ -46,7 +46,7 @@ describe("My Token", () => {
     it("should return 1MT balance for signer 0", async () => {
       const signer0 = signers[0];
       expect(await myTokenC.balanceOf(signer0)).equal(
-        mintingAmount * 10n ** decimal
+        MINTINGAMOUNT * 10n ** DECIMAL
       );
     });
   });
@@ -58,7 +58,7 @@ describe("My Token", () => {
       const signer1 = signers[1];
       await expect(
         myTokenC.transfer(
-          hre.ethers.parseUnits("0.5", decimal),
+          hre.ethers.parseUnits("0.5", DECIMAL),
           signer1.address
         )
       )
@@ -66,10 +66,10 @@ describe("My Token", () => {
         .withArgs(
           signer0.address,
           signer1.address,
-          hre.ethers.parseUnits("0.5", decimal)
+          hre.ethers.parseUnits("0.5", DECIMAL)
         );
       expect(await myTokenC.balanceOf(signer1)).equal(
-        hre.ethers.parseUnits("0.5", decimal)
+        hre.ethers.parseUnits("0.5", DECIMAL)
       );
 
       // const filter = myTokenC.filters.Transfer(signer0.address);
@@ -90,7 +90,7 @@ describe("My Token", () => {
       // await의 위치를 expect 바깥으로 바꿔줌으로 해결
       await expect(
         myTokenC.transfer(
-          hre.ethers.parseUnits((mintingAmount + 1n).toString(), decimal),
+          hre.ethers.parseUnits((MINTINGAMOUNT + 1n).toString(), DECIMAL),
           signer1.address
         )
       ).to.be.revertedWith("insufficient balance");
@@ -100,10 +100,10 @@ describe("My Token", () => {
     it("should emit Approval event", async () => {
       const signer1 = signers[1];
       await expect(
-        myTokenC.approve(signer1, hre.ethers.parseUnits("10", decimal))
+        myTokenC.approve(signer1, hre.ethers.parseUnits("10", DECIMAL))
       )
         .to.emit(myTokenC, "Approval")
-        .withArgs(signer1.address, hre.ethers.parseUnits("10", decimal));
+        .withArgs(signer1.address, hre.ethers.parseUnits("10", DECIMAL));
     });
 
     it("should be reverted with insufficient allowance error", async () => {
@@ -115,12 +115,12 @@ describe("My Token", () => {
           .transferFrom(
             signer0.address,
             signer1.address,
-            hre.ethers.parseUnits("1", decimal)
+            hre.ethers.parseUnits("1", DECIMAL)
           )
       ).to.be.revertedWith("insufficient allowance");
     });
     // 단순하게 equal로 비교
-    it("should move signer0 to signer1 by signer1 VER1", async () => {
+    it("should move signer0 to signer1 by signer1", async () => {
       const signer0 = signers[0];
       const signer1 = signers[1];
       // connect를 통해 signer0가 트랜잭션을 만들게된다.
@@ -128,30 +128,15 @@ describe("My Token", () => {
       // approve 메소드를 이용해 signer1에게 해당되는 개수 만큼 허용을 해준다.
       await myTokenC
         .connect(signer0)
-        .approve(signer1, hre.ethers.parseUnits("20", decimal));
+        .approve(signer1, hre.ethers.parseUnits("20", DECIMAL));
       // signer0 에서 singer1으로 10개를 보낸다.
       await myTokenC
         .connect(signer1)
-        .transferFrom(signer0, signer1, hre.ethers.parseUnits("10", decimal));
+        .transferFrom(signer0, signer1, hre.ethers.parseUnits("10", DECIMAL));
       // await으로 처리를 기다린 후에 equal을 해야 정상적으로 작동
       expect(await myTokenC.balanceOf(signer1)).equal(
-        hre.ethers.parseUnits("10", decimal) // signer1의 잔액이 10MT인지 확인
+        hre.ethers.parseUnits("10", DECIMAL) // signer1의 잔액이 10MT인지 확인
       );
-    });
-    //
-    it("should move signer0 to signer1 by signer1 VER2", async () => {
-      const signer0 = signers[0];
-      const signer1 = signers[1];
-      // connect를 통해 signer0가 트랜잭션을 만들게된다.
-      // signer0가 msg.sender가 되므로
-      // approve 메소드를 이용해 signer1에게 해당되는 개수 만큼 허용을 해준다.
-      await myTokenC.approve(signer1, hre.ethers.parseUnits("20", decimal));
-      // signer0 에서 singer1으로 10개를 보내는 이벤트 발생
-      await expect(
-        myTokenC.approve(signer1, hre.ethers.parseUnits("10", decimal))
-      )
-        .to.emit(myTokenC, "Approval")
-        .withArgs(signer1.address, hre.ethers.parseUnits("10", decimal));
     });
   });
 });
