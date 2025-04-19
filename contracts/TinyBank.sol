@@ -20,8 +20,8 @@ contract TinyBank {
     event Staked(address, uint256);
 
     IMyToken public stakingToken;
-    mapping(address => uint256) staked;
-    uint256 totalStaked;
+    mapping(address => uint256) public staked;
+    uint256 public totalStaked;
 
     constructor(IMyToken _stackingToken) {
         stakingToken = _stackingToken;
