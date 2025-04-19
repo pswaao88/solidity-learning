@@ -2,9 +2,7 @@ import hre from "hardhat";
 import { expect } from "chai";
 import { MyToken } from "../typechain-types";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-
-const MINTINGAMOUNT = 100n;
-const DECIMAL = 18n;
+import { DECIMAL, MINTING_AMOUNT } from "./constant";
 
 describe("My Token", () => {
   let myTokenC: MyToken;
@@ -18,8 +16,8 @@ describe("My Token", () => {
     myTokenC = await hre.ethers.deployContract("MyToken", [
       "MyToken",
       "MT",
-      18,
-      100,
+      DECIMAL,
+      MINTING_AMOUNT,
     ]);
   });
 
@@ -36,7 +34,7 @@ describe("My Token", () => {
 
     it("should return 100 totalSupply", async () => {
       expect(await myTokenC.totalSupply()).equal(
-        MINTINGAMOUNT * 10n ** DECIMAL
+        MINTING_AMOUNT * 10n ** DECIMAL
       );
     });
   });
@@ -46,7 +44,7 @@ describe("My Token", () => {
     it("should return 1MT balance for signer 0", async () => {
       const signer0 = signers[0];
       expect(await myTokenC.balanceOf(signer0)).equal(
-        MINTINGAMOUNT * 10n ** DECIMAL
+        MINTING_AMOUNT * 10n ** DECIMAL
       );
     });
   });
@@ -90,7 +88,7 @@ describe("My Token", () => {
       // await의 위치를 expect 바깥으로 바꿔줌으로 해결
       await expect(
         myTokenC.transfer(
-          hre.ethers.parseUnits((MINTINGAMOUNT + 1n).toString(), DECIMAL),
+          hre.ethers.parseUnits((MINTING_AMOUNT + 1n).toString(), DECIMAL),
           signer1.address
         )
       ).to.be.revertedWith("insufficient balance");
