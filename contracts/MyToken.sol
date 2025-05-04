@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.28;
 
-contract MyToken {
+import "./ManageAccess.sol";
+
+contract MyToken is ManageAccess {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed spender, uint256 amount);
 
-    address public owner;
-    address public manager;
     string public name; // 토큰이름 ex) 비트코인, 이더리움, 밈코인...
     string public symbol; // ex) 이더리움: eth...
     uint8 public decimals; // 소수점 자리수 1이면 0.1까지
@@ -22,25 +22,12 @@ contract MyToken {
         string memory _symbol,
         uint8 _decimals,
         uint256 _amount
-    ) {
+    ) ManageAccess(msg.sender, msg.sender) {
         owner = msg.sender;
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
         _mint(_amount * 10 ** decimals, msg.sender);
-    }
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "You are not authorized");
-        _;
-    }
-
-    modifier onlyManager() {
-        require(
-            msg.sender == manager,
-            "You are not authorized to manage this token"
-        );
-        _;
     }
 
     // transaction
