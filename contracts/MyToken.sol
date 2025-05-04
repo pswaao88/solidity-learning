@@ -6,6 +6,8 @@ contract MyToken {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed spender, uint256 amount);
 
+    address public owner;
+    address public manager;
     string public name; // 토큰이름 ex) 비트코인, 이더리움, 밈코인...
     string public symbol; // ex) 이더리움: eth...
     uint8 public decimals; // 소수점 자리수 1이면 0.1까지
@@ -21,10 +23,24 @@ contract MyToken {
         uint8 _decimals,
         uint256 _amount
     ) {
+        owner = msg.sender;
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
         _mint(_amount * 10 ** decimals, msg.sender);
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "You are not authorized");
+        _;
+    }
+
+    modifier onlyManager() {
+        require(
+            msg.sender == manager,
+            "You are not authorized to manage this token"
+        );
+        _;
     }
 
     // transaction
@@ -44,16 +60,20 @@ contract MyToken {
         emit Transfer(from, to, amount);
     }
 
-    function mint(uint256 amount, address owner) external {
-        _mint(amount, owner);
+    function setManager(address _manager) external onlyOwner {
+        manager = _manager;
+    }
+
+    function mint(uint256 amount, address to) external onlyManager {
+        _mint(amount, to);
     }
 
     // 토큰 발행
-    function _mint(uint256 amount, address owner) internal {
+    function _mint(uint256 amount, address to) internal {
         totalSupply += amount;
-        balanceOf[owner] += amount;
+        balanceOf[to] += amount;
 
-        emit Transfer(address(0), owner, amount);
+        emit Transfer(address(0), to, amount);
     }
 
     function transfer(uint256 amount, address to) external {
