@@ -1,7 +1,7 @@
 //SPDX-License-Identifier:MIT
 pragma solidity ^0.8.28;
 
-abstract contract MulitManagedAccess {
+abstract contract MultiManagedAccess {
     uint constant MANAGER_NUMBERS = 5;
     // 반드시 생성자가 초기화
     uint immutable BACKOUT_MANAGER_NUMBER;
@@ -26,7 +26,7 @@ abstract contract MulitManagedAccess {
     }
 
     modifier onlyOnwer() {
-        require(msg.sender == owner, "YYou are not authorized");
+        require(msg.sender == owner, "You are not authorized");
         _;
     }
 
