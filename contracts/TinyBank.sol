@@ -9,7 +9,6 @@
 
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
-import "./ManagedAccess.sol";
 import "./MultiManagedAccess.sol";
 
 interface IMyToken {

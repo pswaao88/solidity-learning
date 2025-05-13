@@ -10,15 +10,22 @@ describe("TinyBank", () => {
   let tinyBankC: TinyBank;
   beforeEach(async () => {
     signers = await hre.ethers.getSigners();
+    // 0~4까지 매니저 권한 부여
+    const managers = signers.slice(0, 5).map((s) => s.address);
+
     myTokenC = await hre.ethers.deployContract("MyToken", [
       "MyToken",
       "MT",
       DECIMAL,
       MINTING_AMOUNT,
     ]);
+
     tinyBankC = await hre.ethers.deployContract("TinyBank", [
       await myTokenC.getAddress(),
+      managers,
+      managers.length,
     ]);
+
     await myTokenC.setManager(tinyBankC.getAddress());
   });
 
@@ -78,7 +85,7 @@ describe("TinyBank", () => {
       const rewardToChange = hre.ethers.parseUnits("10000", DECIMAL);
       await expect(
         tinyBankC.connect(hacker).setRewardPerBlock(rewardToChange)
-      ).to.be.revertedWith("You are not authorized to manage this contract");
+      ).to.be.revertedWith("Not all managers confirmed yet");
     });
   });
 });
