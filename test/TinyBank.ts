@@ -10,7 +10,7 @@ describe("TinyBank", () => {
   let tinyBankC: TinyBank;
   beforeEach(async () => {
     signers = await hre.ethers.getSigners();
-    // 0~4까지 매니저 권한 부여
+    // 0~4까지 매니저 권한 부여 총 5명에게 부여
     const managers = signers.slice(0, 5).map((s) => s.address);
 
     myTokenC = await hre.ethers.deployContract("MyToken", [
@@ -85,7 +85,23 @@ describe("TinyBank", () => {
       const rewardToChange = hre.ethers.parseUnits("10000", DECIMAL);
       await expect(
         tinyBankC.connect(hacker).setRewardPerBlock(rewardToChange)
-      ).to.be.revertedWith("Not all managers confirmed yet");
+      ).to.be.revertedWith("Not all confirmed yet");
+    });
+  });
+  describe("Managers", () => {
+    it("should revert when making transction by not manager", async () => {
+      const notManager = signers[5];
+      const newReward = hre.ethers.parseEther("100");
+      await expect(tinyBankC.connect(notManager).confirm()).to.be.revertedWith(
+        "You are not a manager"
+      );
+    });
+    it("should revert when not confirmed by all manager", async () => {
+      const notManager = signers[5];
+      const newReward = hre.ethers.parseEther("100");
+      await expect(
+        tinyBankC.connect(notManager).setRewardPerBlock(newReward)
+      ).to.be.revertedWith("Not all confirmed yet");
     });
   });
 });
